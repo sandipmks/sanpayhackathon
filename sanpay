@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SanPay Green FinOS — Google Hackathon Edition</title>
+  <!-- Google Fonts: Inter & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            forest: {
+              950: '#03140e',
+              900: '#06251b',
+              800: '#0c382a',
+              700: '#144c3a',
+              600: '#1c634c',
+              500: '#237b5f',
+              100: '#e1f5ee',
+              50: '#f0faf6'
+            },
+            emerald: {
+              300: '#6ee7b7',
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+            },
+            mint: {
+              50: '#f4fbf7',
+              100: '#e6f7ef',
+              200: '#c5edda',
+              500: '#10b981'
+            },
+            surface: {
+              light: '#ffffff',
+              subtle: '#f8fafc',
+              border: '#e2e8f0',
+              text: '#0f172a',
+              muted: '#64748b'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Premium White & Emerald Neobank Styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #a7f3d0;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #10b981;
+    }
+    .clean-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03);
+    }
+    .clean-card-emerald {
+      background: linear-gradient(135deg, #f0faf6 0%, #ffffff 100%);
+      border: 1px solid #a7f3d0;
+      box-shadow: 0 8px 30px -4px rgba(16, 185, 129, 0.12);
+    }
+    .orb-pulse {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.6);
+      animation: pulse-ring 2s infinite cubic-bezier(0.66, 0, 0, 1);
+    }
+    @keyframes pulse-ring {
+      to {
+        box-shadow: 0 0 0 24px rgba(16, 185, 129, 0);
+      }
+    }
+    .orb-listening {
+      animation: listening-wave 1.2s infinite ease-in-out;
+    }
+    @keyframes listening-wave {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5)); }
+      50% { transform: scale(1.12); filter: drop-shadow(0 0 22px rgba(5, 150, 105, 0.8)); }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white">
+
+<!-- 1. AUTHENTICATION / LOGIN SCREEN (INITIAL STATE) -->
+<div id="auth-screen" class="fixed inset-0 z-50 bg-gradient-to-br from-mint-50 via-white to-emerald-50 flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl border border-emerald-100 relative overflow-hidden">
+    <!-- Top Decorative Gradient Band -->
+    <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600"></div>
+    
+    <!-- Branding Header -->
+    <div class="text-center mb-8 pt-2">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-lg shadow-emerald-500/30 mb-4">
+        <i class="fa-solid fa-leaf text-2xl"></i>
+      </div>
+      <h2 class="text-2xl font-display font-bold text-slate-900 tracking-tight">SanPay Green FinOS</h2>
+      <p class="text-xs text-slate-500 mt-1">Google Hackathon Edition · Proactive Green Neobank</p>
+      
+      <!-- Security Protocol Badge -->
+      <div class="inline-flex items-center gap-1.5 mt-3 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200">
+        <i class="fa-solid fa-shield-halved text-xs text-emerald-600"></i>
+        <span>HttpOnly Cookie Session Protection</span>
+      </div>
+    </div>
+
+    <!-- Login Form -->
+    <form id="login-form" onsubmit="handleAuthLogin(event)" class="space-y-4">
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1.5">
+          Work Email / Identity
+        </label>
+        <div class="relative">
+          <i class="fa-solid fa-envelope absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+          <input type="email" id="login-email" required value="alya.nabila@sanpay.eco"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl text-sm text-slate-800 outline-none transition-all placeholder:text-slate-400">
+        </div>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1.5">
+          <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Passkey / Password
+          </label>
+          <a href="#" onclick="showToast('Hackathon Demo Passkey is pre-filled'); return false;" class="text-[11px] text-emerald-600 font-medium hover:underline">Auto Demo</a>
+        </div>
+        <div class="relative">
+          <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+          <input type="password" id="login-password" required value="green-finos-2026"
+            class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl text-sm text-slate-800 outline-none transition-all">
+        </div>
+      </div>
+
+      <!-- Quick Demo Account Shortcut Selector -->
+      <div class="bg-slate-50 rounded-xl p-3 border border-slate-200/80 text-xs text-slate-600 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-full bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-xs">
+            AN
+          </div>
+          <div>
+            <div class="font-semibold text-slate-800">Alya Nabila (Guardian Lvl 3)</div>
+            <div class="text-[10px] text-slate-500">Jakarta Metropolitan Account</div>
+          </div>
+        </div>
+        <span class="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded">Pre-loaded</span>
+      </div>
+
+      <div class="pt-2">
+        <button type="submit" id="login-btn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center space-x-2">
+          <span>Authenticate & Access FinOS</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+      </div>
+    </form>
+
+    <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+      <span>Built for Google Cloud AI Builder Cup</span>
+      <span class="font-mono text-emerald-600 font-semibold">Gemini Live Ready</span>
+    </div>
+  </div>
+</div>
+
+<!-- 2. MAIN APPLICATION CONTAINER (REVEALED AFTER LOGIN) -->
+<div id="main-app" class="flex-1 flex overflow-hidden min-h-screen bg-slate-50 hidden">
+  
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex-shrink-0 flex flex-col justify-between hidden md:flex transition-all duration-300 z-30 shadow-sm">
+    <div class="p-5 flex flex-col h-full">
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3 mb-8 px-2 cursor-pointer" onclick="navigateTo('dashboard')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center shadow-md shadow-emerald-600/20">
+          <i class="fa-solid fa-leaf text-white text-lg"></i>
+        </div>
+        <div>
+          <span class="font-display font-bold text-lg tracking-tight text-slate-900">SanPay FinOS</span>
+          <span class="block text-[10px] uppercase font-bold tracking-widest text-emerald-600">Green FinTech</span>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1 flex-1 overflow-y-auto pr-1">
+        <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-emerald-800 bg-emerald-50/80 border border-emerald-200/60 transition-all group">
+          <i class="fa-solid fa-chart-pie w-5 text-center text-emerald-600"></i>
+          <span>Dashboard</span>
+        </button>
+
+        <button onclick="navigateTo('simulator')" id="nav-simulator" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-wand-magic-sparkles w-5 text-center text-emerald-600 animate-pulse"></i>
+          <span class="font-semibold text-slate-800">Before You Spend</span>
+          <span class="ml-auto text-[10px] bg-emerald-600 text-white font-bold px-1.5 py-0.5 rounded">CORE</span>
+        </button>
+
+        <button onclick="navigateTo('transactions')" id="nav-transactions" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-receipt w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Transactions</span>
+        </button>
+
+        <button onclick="navigateTo('carbon')" id="nav-carbon" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-cloud-arrow-down w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Carbon Analytics</span>
+        </button>
+
+        <button onclick="navigateTo('offset')" id="nav-offset" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-seedling w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Offset & Invest</span>
+        </button>
+
+        <button onclick="navigateTo('greenmap')" id="nav-greenmap" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-map-location-dot w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Green Map</span>
+        </button>
+
+        <button onclick="navigateTo('missions')" id="nav-missions" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-bullseye w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Missions</span>
+        </button>
+
+        <button onclick="navigateTo('rewards')" id="nav-rewards" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-gift w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Rewards</span>
+        </button>
+
+        <button onclick="navigateTo('ai')" id="nav-ai" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-brain w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>SanPay AI</span>
+        </button>
+
+        <button onclick="navigateTo('analytics')" id="nav-analytics" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-chart-line w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Analytics</span>
+        </button>
+
+        <button onclick="navigateTo('partner')" id="nav-partner" class="nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group">
+          <i class="fa-solid fa-handshake w-5 text-center text-slate-400 group-hover:text-emerald-600"></i>
+          <span>Partner Network</span>
+        </button>
+      </nav>
+
+      <!-- Eco Status Pill & Profile Card -->
+      <div class="pt-4 border-t border-slate-200 space-y-3">
+        <div class="bg-forest-50 border border-emerald-200/80 rounded-2xl p-3 flex items-center justify-between">
+          <div>
+            <span class="text-[10px] text-slate-500 uppercase font-bold">Eco Tier</span>
+            <div class="text-xs font-bold text-emerald-800 flex items-center gap-1.5">
+              <i class="fa-solid fa-shield-halved text-emerald-600"></i> Guardian Level 3
+            </div>
+          </div>
+          <span class="text-xs font-display font-bold text-emerald-700 bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-sm">
+            <span id="sidebar-green-points">2,450</span> pts
+          </span>
+        </div>
+
+        <!-- User Profile row with Logout -->
+        <div class="flex items-center justify-between pt-1">
+          <div class="flex items-center space-x-3">
+            <div class="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-xs text-white shadow-sm">
+              AN
+            </div>
+            <div class="text-left">
+              <p class="text-xs font-semibold text-slate-800">Alya Nabila</p>
+              <p class="text-[10px] text-slate-500">Jakarta (WIB)</p>
+            </div>
+          </div>
+          <button onclick="handleAuthLogout()" title="Logout / Lock Session" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded-lg hover:bg-rose-50">
+            <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN VIEW CONTAINER -->
+  <main class="flex-1 flex flex-col h-screen overflow-hidden bg-slate-50">
+    
+    <!-- TOP HEADER -->
+    <header class="h-16 border-b border-slate-200 bg-white/90 backdrop-blur-md px-4 sm:px-8 flex items-center justify-between z-20">
+      <div class="flex items-center space-x-3">
+        <button onclick="toggleMobileMenu()" class="md:hidden text-slate-600 hover:text-slate-900 p-2">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+        <div class="flex items-baseline space-x-2">
+          <h1 id="page-title" class="font-display font-bold text-lg text-slate-900">Dashboard</h1>
+          <span id="demo-badge" class="text-[10px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+            Hackathon Demo Mode
+          </span>
+        </div>
+      </div>
+
+      <!-- Quick Action: Voice Trigger in Top Bar -->
+      <div class="flex items-center space-x-3">
+        <button onclick="openVoiceModal()" class="relative group flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold shadow-md shadow-emerald-600/20 transition-all transform hover:-translate-y-0.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-200 animate-ping mr-0.5"></span>
+          <i class="fa-solid fa-microphone text-white"></i>
+          <span class="hidden sm:inline">Talk to SanPay AI</span>
+          <span class="sm:hidden">Voice AI</span>
+        </button>
+
+        <div class="h-6 w-px bg-slate-200"></div>
+
+        <button onclick="toggleNotification()" class="relative text-slate-500 hover:text-slate-800 p-2">
+          <i class="fa-regular fa-bell"></i>
+          <span class="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT SCROLL AREA -->
+    <div id="content-area" class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6">
+
+      <!-- VIEW 1: DASHBOARD -->
+      <section id="view-dashboard" class="space-y-6">
+        
+        <!-- Pre-Purchase Voice CTA Banner (Clean Neobank Green Gradient) -->
+        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-forest-800 via-emerald-800 to-forest-700 text-white p-7 shadow-xl shadow-emerald-950/10">
+          <div class="absolute -right-8 -top-8 w-60 h-60 rounded-full bg-emerald-400/10 blur-2xl pointer-events-none"></div>
+          <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div class="space-y-2 max-w-2xl">
+              <div class="flex items-center space-x-2 text-emerald-300 text-xs font-bold tracking-wide uppercase">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+                <span>Proactive Carbon Intelligence</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-display font-bold text-white tracking-tight leading-snug">
+                "What happens to my money and the planet if I make this purchase?"
+              </h2>
+              <p class="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+                Consult SanPay voice AI <span class="text-white font-bold underline decoration-emerald-400 underline-offset-4">BEFORE</span> completing checkout. Model instant CO2e emissions, discover certified lower-carbon alternatives, and earn Green Points.
+              </p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+              <button onclick="openVoiceModal()" class="flex-1 md:flex-initial flex items-center justify-center space-x-2 bg-white hover:bg-emerald-50 text-emerald-900 px-5 py-3 rounded-2xl font-bold text-sm shadow-md transition-all">
+                <i class="fa-solid fa-microphone-lines text-emerald-600 text-base"></i>
+                <span>Ask via Voice AI</span>
+              </button>
+              <button onclick="navigateTo('simulator')" class="flex-1 md:flex-initial flex items-center justify-center space-x-2 bg-emerald-900/60 hover:bg-emerald-900 text-white border border-emerald-600/40 px-5 py-3 rounded-2xl font-semibold text-sm transition-all">
+                <i class="fa-solid fa-sliders"></i>
+                <span>Open Simulator</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4-METRIC TOP CARDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Card 1: Balance -->
+          <div class="clean-card p-5 rounded-2xl">
+            <div class="flex justify-between items-start">
+              <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">SanPay Balance</span>
+              <div class="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <i class="fa-solid fa-wallet text-sm"></i>
+              </div>
+            </div>
+            <div class="mt-3">
+              <span class="text-2xl font-display font-bold text-slate-900">Rp 8.450.000</span>
+              <p class="text-xs text-slate-500 mt-1 flex items-center">
+                <span class="text-emerald-600 font-bold mr-1"><i class="fa-solid fa-arrow-up"></i> +12%</span> vs last month
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 2: Carbon Footprint -->
+          <div class="clean-card p-5 rounded-2xl">
+            <div class="flex justify-between items-start">
+              <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Est. Carbon Footprint</span>
+              <div class="w-8 h-8 rounded-xl bg-forest-50 flex items-center justify-center text-emerald-700">
+                <i class="fa-solid fa-leaf text-sm"></i>
+              </div>
+            </div>
+            <div class="mt-3">
+              <span class="text-2xl font-display font-bold text-slate-900">42.8 <span class="text-sm font-sans font-normal text-slate-500">kg CO2e</span></span>
+              <p class="text-xs text-slate-500 mt-1 flex items-center">
+                <span class="text-emerald-600 font-bold mr-1"><i class="fa-solid fa-arrow-down"></i> -18.4%</span> net reduction
+              </p>
+            </div>
+          </div>
+
+          <!-- Card 3: Green Score -->
+          <div class="clean-card p-5 rounded-2xl">
+            <div class="flex justify-between items-start">
+              <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">SanPay Green Score</span>
+              <div class="w-8 h-8 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
+                <i class="fa-solid fa-chart-simple text-sm"></i>
+              </div>
+            </div>
+            <div class="mt-3 flex items-baseline space-x-2">
+              <span class="text-2xl font-display font-bold text-slate-900">842</span>
+              <span class="text-xs text-emerald-600 font-bold uppercase">Excellent</span>
+            </div>
+            <div class="w-full bg-slate-100 h-2 rounded-full mt-2.5 overflow-hidden">
+              <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full" style="width: 84.2%"></div>
+            </div>
+          </div>
+
+          <!-- Card 4: Green Points -->
+          <div class="clean-card p-5 rounded-2xl">
+            <div class="flex justify-between items-start">
+              <span class="text-xs text-slate-500 font-semibold uppercase tracking-wider">Green Points</span>
+              <div class="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                <i class="fa-solid fa-coins text-sm"></i>
+              </div>
+            </div>
+            <div class="mt-3">
+              <span id="dashboard-green-points" class="text-2xl font-display font-bold text-slate-900">2,450</span>
+              <p class="text-xs text-slate-500 mt-1">
+                Value ≈ <span class="text-slate-800 font-semibold">Rp 245.000</span> cashback
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TWO COLUMN SECTION: RECENT SIMULATION SHOWCASE + TRANSACTIONS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Left: Recent Pre-Transaction Simulations (2 cols) -->
+          <div class="lg:col-span-2 clean-card p-6 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-display font-bold text-base text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-emerald-600 text-sm"></i>
+                    Recent "Before You Spend" Simulations
+                  </h3>
+                  <p class="text-xs text-slate-500">Hypothetical purchasing simulations — separate from verified bank ledgers</p>
+                </div>
+                <button onclick="navigateTo('simulator')" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+                  New Simulation <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+
+              <!-- List of simulations -->
+              <div id="dashboard-simulations-list" class="space-y-3">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Eco tip badge -->
+            <div class="mt-6 p-4 rounded-2xl bg-mint-50 border border-emerald-200/70 flex items-center justify-between text-xs">
+              <div class="flex items-center space-x-3 text-slate-700">
+                <i class="fa-solid fa-lightbulb text-amber-500 text-base"></i>
+                <span>Choosing public train over car-hailing avoids ~4.8 kg CO2e per trip in Jabodetabek.</span>
+              </div>
+              <span class="text-[10px] text-emerald-800 font-bold bg-white px-2.5 py-1 rounded-lg border border-emerald-200 shadow-sm">Eco Tip</span>
+            </div>
+          </div>
+
+          <!-- Right: Actual Transactions Feed -->
+          <div class="clean-card p-6 rounded-3xl">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-display font-bold text-base text-slate-900">Actual Transactions</h3>
+                <p class="text-[11px] text-slate-500">Verified payment records</p>
+              </div>
+              <button onclick="navigateTo('transactions')" class="text-xs text-emerald-600 font-semibold hover:underline">View All</button>
+            </div>
+
+            <div id="dashboard-transactions-list" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- VIEW 2: BEFORE YOU SPEND - SIMULATOR -->
+      <section id="view-simulator" class="hidden space-y-6">
+        
+        <!-- Header banner -->
+        <div class="clean-card-emerald p-7 rounded-3xl">
+          <div class="max-w-3xl">
+            <span class="text-xs font-bold text-emerald-700 uppercase tracking-widest bg-emerald-100/80 px-2.5 py-1 rounded-md">Core Signature Feature</span>
+            <h2 class="text-2xl font-display font-bold text-slate-900 mt-2">Before You Spend</h2>
+            <p class="text-sm text-slate-600 mt-1">
+              Simulate the carbon emissions and rewards of your proposed purchase <span class="font-bold text-emerald-700">before</span> you swipe or pay. See verifiable assumptions, avoid emissions, and get instant recommendations.
+            </p>
+          </div>
+        </div>
+
+        <!-- Two-column Simulator Grid: Input Form vs Comparison Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <!-- LEFT: SIMULATION INPUT FORM (5 cols) -->
+          <div class="lg:col-span-5 clean-card p-6 rounded-3xl">
+            <h3 class="font-display font-bold text-base text-slate-900 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-emerald-600"></i> Purchase Simulation Parameters
+            </h3>
+
+            <form id="simulator-form" onsubmit="handleRunSimulation(event)" class="space-y-4">
+              <!-- Description -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Purchase Description <span class="text-emerald-600">*</span>
+                </label>
+                <input type="text" id="sim-desc" required placeholder="e.g. Lunch steak package with coworkers"
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none transition-colors">
+              </div>
+
+              <!-- Amount & Category -->
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Amount (IDR) <span class="text-emerald-600">*</span>
+                  </label>
+                  <input type="number" id="sim-amount" required min="1000" step="500" value="150000"
+                    class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-800 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                    Category <span class="text-emerald-600">*</span>
+                  </label>
+                  <select id="sim-category" onchange="onCategoryChange()" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl px-3 py-2.5 text-sm text-slate-800 outline-none">
+                    <option value="food">Food & Beverage</option>
+                    <option value="ride">Ride-Hailing</option>
+                    <option value="transport">Public Transportation</option>
+                    <option value="retail">Retail & Shopping</option>
+                    <option value="utilities">Utilities & Energy</option>
+                    <option value="travel">Travel & Hotel</option>
+                    <option value="lifestyle">Lifestyle & Others</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Baseline Conventional Option -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Baseline / Conventional Option
+                </label>
+                <input type="text" id="sim-baseline" value="Red Meat (Beef Meal) from casual bistro"
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none">
+              </div>
+
+              <!-- Greener Alternative (Optional or Auto-Suggested) -->
+              <div>
+                <div class="flex justify-between items-center mb-1">
+                  <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    Sustainable Alternative
+                  </label>
+                  <button type="button" onclick="autoSuggestAlternative()" class="text-[11px] text-emerald-600 font-semibold hover:text-emerald-700">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Suggest
+                  </button>
+                </div>
+                <input type="text" id="sim-alternative" value="Local Plant-based Rice Bowl from certified green bistro"
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 outline-none">
+              </div>
+
+              <!-- Optional Alternative Price for Financial Saving Calculation -->
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">
+                  Alternative Price (IDR, Optional)
+                </label>
+                <input type="number" id="sim-alt-price" placeholder="e.g. 95000" value="95000" min="0" step="500"
+                  class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:bg-white rounded-xl px-3.5 py-2.5 text-sm text-slate-800 outline-none">
+              </div>
+
+              <div class="pt-2">
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center space-x-2">
+                  <i class="fa-solid fa-calculator"></i>
+                  <span>Simulate My Impact</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- RIGHT: SIMULATION OUTCOME & COMPARISON (7 cols) -->
+          <div class="lg:col-span-7 flex flex-col space-y-4">
+            
+            <!-- Comparison Cards: Left vs Right -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              <!-- Original Choice Card -->
+              <div class="clean-card p-5 rounded-2xl border-rose-200 relative overflow-hidden bg-rose-50/20">
+                <div class="absolute top-0 right-0 bg-rose-100 text-rose-700 font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-bl-xl border-l border-b border-rose-200">
+                  Original Choice
+                </div>
+                <div class="text-xs text-slate-500 mb-1">Proposed Purchase</div>
+                <div id="res-orig-name" class="font-bold text-sm text-slate-900 line-clamp-1">Red Meat (Beef Meal)</div>
+                <div id="res-orig-cost" class="text-2xl font-display font-bold text-slate-900 mt-2">Rp 150.000</div>
+
+                <div class="mt-4 pt-4 border-t border-slate-100 space-y-2">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-500">Carbon Footprint:</span>
+                    <span id="res-orig-carbon" class="font-bold text-rose-600 text-sm">6.24 kg CO2e</span>
+                  </div>
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-500">Green Points:</span>
+                    <span id="res-orig-points" class="font-semibold text-slate-400">0 pts</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Greener Alternative Card -->
+              <div class="clean-card-emerald p-5 rounded-2xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 bg-emerald-100 text-emerald-800 font-bold text-[10px] uppercase tracking-wider px-3 py-1 rounded-bl-xl border-l border-b border-emerald-200">
+                  <i class="fa-solid fa-leaf text-emerald-600 mr-1"></i> Greener Alternative
+                </div>
+                <div class="text-xs text-emerald-700 font-medium mb-1">Recommended Swap</div>
+                <div id="res-alt-name" class="font-bold text-sm text-slate-900 line-clamp-1">Local Plant-based Rice Bowl</div>
+                <div id="res-alt-cost" class="text-2xl font-display font-bold text-emerald-700 mt-2">Rp 95.000</div>
+
+                <div class="mt-4 pt-4 border-t border-emerald-100 space-y-2">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-600">Carbon Footprint:</span>
+                    <span id="res-alt-carbon" class="font-bold text-emerald-600 text-sm">1.18 kg CO2e</span>
+                  </div>
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-600">Green Points:</span>
+                    <span id="res-alt-points" class="font-bold text-amber-600">+120 pts</span>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Aggregated Potential Impact Bar -->
+            <div class="clean-card p-5 rounded-3xl space-y-4">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500">Your Potential Impact</h4>
+              
+              <div class="grid grid-cols-3 gap-3 text-center">
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                  <span class="block text-[11px] text-slate-500 mb-1">Carbon Avoided</span>
+                  <span id="res-carbon-avoided" class="text-lg font-display font-bold text-emerald-600">-5.06 kg</span>
+                  <span id="res-carbon-pct" class="block text-[10px] text-emerald-700 font-semibold">(81.1% less)</span>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                  <span class="block text-[11px] text-slate-500 mb-1">Money Saved</span>
+                  <span id="res-money-saved" class="text-lg font-display font-bold text-slate-800">Rp 55.000</span>
+                  <span class="block text-[10px] text-slate-500">36.7% cheaper</span>
+                </div>
+                <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                  <span class="block text-[11px] text-slate-500 mb-1">Green Reward</span>
+                  <span id="res-total-points" class="text-lg font-display font-bold text-amber-600">+120 pts</span>
+                  <span class="block text-[10px] text-amber-600 font-medium">Claimable on buy</span>
+                </div>
+              </div>
+
+              <!-- AI Recommendation & Engine Assumptions -->
+              <div class="bg-forest-50 border border-emerald-200 rounded-2xl p-4 space-y-2">
+                <div class="flex items-center space-x-2 text-emerald-800 text-xs font-bold">
+                  <i class="fa-solid fa-robot text-emerald-600"></i>
+                  <span>SanPay AI Analysis</span>
+                </div>
+                <p id="res-ai-recommendation" class="text-xs text-slate-700 leading-relaxed">
+                  Choosing a plant-based local option for this lunch eliminates ~5.06 kg CO2e, equivalent to driving an ICE scooter for 24 km in Jakarta.
+                </p>
+                <div class="pt-2 border-t border-emerald-100 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500">
+                  <span id="res-assumptions">Calculation factor: 0.0416 kg CO2e/IDR (BPS Indonesia Food Emission Index 2024)</span>
+                  <span id="res-confidence" class="bg-white px-2 py-0.5 rounded text-emerald-700 font-semibold border border-emerald-200">Data Confidence: High (88%)</span>
+                </div>
+              </div>
+
+              <!-- Actions: "Ask SanPay AI About This" + "Save Simulation" -->
+              <div class="flex flex-wrap items-center gap-3 pt-1">
+                <button onclick="askAIAboutSimulation()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-all shadow-md shadow-emerald-600/20">
+                  <i class="fa-solid fa-microphone-lines"></i>
+                  <span>Ask SanPay AI About This</span>
+                </button>
+                <button onclick="saveCurrentSimulation()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium py-2.5 px-4 rounded-xl text-xs flex items-center justify-center space-x-2 transition-all">
+                  <i class="fa-solid fa-bookmark"></i>
+                  <span>Save to History</span>
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- VIEW 3: TRANSACTIONS -->
+      <section id="view-transactions" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+          <div>
+            <h2 class="text-xl font-display font-bold text-slate-900">Transaction History</h2>
+            <p class="text-xs text-slate-500">Verified financial transactions with transparent carbon attribution</p>
+          </div>
+          <div class="flex items-center space-x-3">
+            <span class="text-xs text-slate-500">Filter Category:</span>
+            <select id="tx-filter" onchange="filterTransactions()" class="bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs text-slate-800 outline-none">
+              <option value="all">All Categories</option>
+              <option value="food">Food & Beverage</option>
+              <option value="ride">Ride-Hailing</option>
+              <option value="transport">Public Transportation</option>
+              <option value="retail">Retail</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="clean-card rounded-3xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 uppercase font-semibold text-[10px] tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="px-5 py-3.5">Merchant / Item</th>
+                  <th class="px-5 py-3.5">Category</th>
+                  <th class="px-5 py-3.5">Amount</th>
+                  <th class="px-5 py-3.5">Carbon Impact</th>
+                  <th class="px-5 py-3.5">Method & Source</th>
+                  <th class="px-5 py-3.5">Green Points</th>
+                  <th class="px-5 py-3.5">Date</th>
+                </tr>
+              </thead>
+              <tbody id="full-transactions-body" class="divide-y divide-slate-100 text-slate-700">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: CARBON ANALYTICS -->
+      <section id="view-carbon" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-display font-bold text-slate-900">Carbon Footprint Breakdown</h2>
+          <p class="text-xs text-slate-500">Emissions calculated using standard activity factors & monetary proxies</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div class="clean-card p-5 rounded-3xl text-center">
+            <span class="text-xs text-slate-500 uppercase font-semibold">Monthly Scope 3 Total</span>
+            <div class="text-3xl font-display font-bold text-slate-900 my-2">42.8 <span class="text-sm font-normal text-slate-500">kg CO2e</span></div>
+            <p class="text-[11px] text-emerald-600 font-semibold">Below national urban average (58.2 kg)</p>
+          </div>
+          <div class="clean-card p-5 rounded-3xl text-center">
+            <span class="text-xs text-slate-500 uppercase font-semibold">Top Emission Category</span>
+            <div class="text-3xl font-display font-bold text-rose-600 my-2">Food & Dining</div>
+            <p class="text-[11px] text-slate-500">Accounts for 48% of total spending emissions</p>
+          </div>
+          <div class="clean-card p-5 rounded-3xl text-center">
+            <span class="text-xs text-slate-500 uppercase font-semibold">CO2e Avoided via SanPay</span>
+            <div class="text-3xl font-display font-bold text-emerald-600 my-2">18.6 <span class="text-sm font-normal text-slate-500">kg CO2e</span></div>
+            <p class="text-[11px] text-emerald-700 font-semibold">Through pre-spending alternative choices</p>
+          </div>
+        </div>
+
+        <!-- Emissions Bar Distribution -->
+        <div class="clean-card p-6 rounded-3xl space-y-4">
+          <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider">Emissions by Spending Sector</h3>
+          
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-700 font-medium">Food & Beverage (Dining & Groceries)</span>
+                <span class="text-slate-900 font-bold">20.5 kg CO2e (48%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-rose-500 h-full rounded-full" style="width: 48%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-700 font-medium">Ride-Hailing & Private Fuel</span>
+                <span class="text-slate-900 font-bold">12.8 kg CO2e (30%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-amber-500 h-full rounded-full" style="width: 30%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-700 font-medium">Utilities & Electricity</span>
+                <span class="text-slate-900 font-bold">6.5 kg CO2e (15%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-teal-500 h-full rounded-full" style="width: 15%"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-700 font-medium">Retail & Other Lifestyle</span>
+                <span class="text-slate-900 font-bold">3.0 kg CO2e (7%)</span>
+              </div>
+              <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full" style="width: 7%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: OFFSET & INVEST -->
+      <section id="view-offset" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-display font-bold text-slate-900">Carbon Offset Projects</h2>
+          <p class="text-xs text-slate-500">Verified environmental credits sourced from Indonesian conservation initiatives</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Project 1 -->
+          <div class="clean-card rounded-3xl overflow-hidden flex flex-col justify-between p-5 space-y-4">
+            <div class="space-y-2">
+              <span class="text-[10px] uppercase font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-200">Verified VCS #2411</span>
+              <h3 class="font-display font-bold text-base text-slate-900">Katingan Mentaya Peatland</h3>
+              <p class="text-xs text-slate-600">Protecting biodiversity and peat swamp forests in Central Kalimantan.</p>
+              <div class="text-xs text-slate-500 pt-2">Rate: <span class="text-emerald-700 font-bold">Rp 65.000 / 10 kg CO2e</span></div>
+            </div>
+            <button onclick="simulateOffset('Katingan Mentaya', 65000)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-sm">
+              Offset 10 kg CO2e
+            </button>
+          </div>
+
+          <!-- Project 2 -->
+          <div class="clean-card rounded-3xl overflow-hidden flex flex-col justify-between p-5 space-y-4">
+            <div class="space-y-2">
+              <span class="text-[10px] uppercase font-bold text-teal-800 bg-teal-100 px-2.5 py-0.5 rounded border border-teal-200">Blue Carbon</span>
+              <h3 class="font-display font-bold text-base text-slate-900">Bali Mangrove Restoration</h3>
+              <p class="text-xs text-slate-600">Replanting native Rhizophora mangrove colonies along Benoa Bay.</p>
+              <div class="text-xs text-slate-500 pt-2">Rate: <span class="text-emerald-700 font-bold">Rp 45.000 / 10 kg CO2e</span></div>
+            </div>
+            <button onclick="simulateOffset('Bali Mangrove', 45000)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-sm">
+              Offset 10 kg CO2e
+            </button>
+          </div>
+
+          <!-- Project 3 -->
+          <div class="clean-card rounded-3xl overflow-hidden flex flex-col justify-between p-5 space-y-4">
+            <div class="space-y-2">
+              <span class="text-[10px] uppercase font-bold text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded border border-amber-200">Clean Energy</span>
+              <h3 class="font-display font-bold text-base text-slate-900">Kamojang Geothermal Power</h3>
+              <p class="text-xs text-slate-600">Replacing diesel generation with zero-emission geothermal baseload energy.</p>
+              <div class="text-xs text-slate-500 pt-2">Rate: <span class="text-emerald-700 font-bold">Rp 50.000 / 10 kg CO2e</span></div>
+            </div>
+            <button onclick="simulateOffset('Kamojang Geothermal', 50000)" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all shadow-sm">
+              Offset 10 kg CO2e
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 6: GREEN MAP (FAIL-SAFE ARCHITECTURE) -->
+      <section id="view-greenmap" class="hidden space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+          <div>
+            <h2 class="text-xl font-display font-bold text-slate-900">SanPay Green Map</h2>
+            <p class="text-xs text-slate-500">Discover verified eco-certified merchants, refill hubs, and EV charging stations nearby</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-[11px] bg-white text-slate-700 px-3 py-1 rounded-full border border-slate-200 flex items-center gap-1.5 shadow-sm">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Google Maps Fallback-Ready
+            </span>
+          </div>
+        </div>
+
+        <!-- Map Container: Custom Vector Eco-Map with dynamic points -->
+        <div class="clean-card rounded-3xl p-4 relative overflow-hidden">
+          <div class="flex flex-col lg:flex-row gap-4 h-[440px]">
+            <!-- Interactive Map Graphic Canvas/SVG -->
+            <div class="flex-1 bg-slate-100 rounded-2xl relative overflow-hidden border border-slate-200 flex items-center justify-center">
+              <!-- Styled Grid Background -->
+              <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(#10b981 1.5px, transparent 1.5px); background-size: 24px 24px;"></div>
+              
+              <!-- Jakarta Geo Canvas Overlay -->
+              <svg viewBox="0 0 800 500" class="w-full h-full object-cover">
+                <!-- Roads/Waterway abstraction -->
+                <path d="M50 250 Q 200 220 400 260 T 750 240" fill="none" stroke="#cbd5e1" stroke-width="8" />
+                <path d="M200 50 Q 240 250 230 450" fill="none" stroke="#cbd5e1" stroke-width="6" />
+                <path d="M550 50 Q 560 250 540 450" fill="none" stroke="#cbd5e1" stroke-width="6" />
+                <path d="M50 350 C 250 300, 500 400, 750 320" fill="none" stroke="#10b981" stroke-width="3" stroke-dasharray="4 4" />
+
+                <!-- Location Pin 1: Kopi Kenangan Lestari -->
+                <g class="cursor-pointer group" onclick="selectMapMerchant(0)">
+                  <circle cx="280" cy="220" r="14" fill="#a7f3d0" class="animate-ping opacity-75" />
+                  <circle cx="280" cy="220" r="10" fill="#059669" />
+                  <text x="280" y="245" fill="#0f172a" font-size="11" text-anchor="middle" font-weight="bold">Kopi Lestari (Refill)</text>
+                </g>
+
+                <!-- Location Pin 2: MRT Senayan -->
+                <g class="cursor-pointer group" onclick="selectMapMerchant(1)">
+                  <circle cx="420" cy="190" r="14" fill="#bae6fd" class="animate-ping opacity-75" />
+                  <circle cx="420" cy="190" r="10" fill="#0284c7" />
+                  <text x="420" y="215" fill="#0f172a" font-size="11" text-anchor="middle" font-weight="bold">MRT Senayan Station</text>
+                </g>
+
+                <!-- Location Pin 3: Cleanomic Bulk Store -->
+                <g class="cursor-pointer group" onclick="selectMapMerchant(2)">
+                  <circle cx="580" cy="280" r="14" fill="#fde68a" class="animate-ping opacity-75" />
+                  <circle cx="580" cy="280" r="10" fill="#d97706" />
+                  <text x="580" y="305" fill="#0f172a" font-size="11" text-anchor="middle" font-weight="bold">Zero-Waste Bulk Store</text>
+                </g>
+
+                <!-- User location marker -->
+                <circle cx="350" cy="250" r="8" fill="#e11d48" stroke="#ffffff" stroke-width="2" />
+                <text x="350" y="275" fill="#be123c" font-size="11" text-anchor="middle" font-weight="bold">You are here</text>
+              </svg>
+
+              <!-- Map Overlay Notice -->
+              <div class="absolute bottom-3 left-3 bg-white/95 border border-slate-200 px-3 py-1.5 rounded-xl text-[10px] text-slate-700 shadow-sm">
+                <i class="fa-solid fa-location-crosshairs text-emerald-600 mr-1"></i> Jakarta Metropolitan Cluster · 3 Eco-Partners Near You
+              </div>
+            </div>
+
+            <!-- Merchant Details Sidebar -->
+            <div id="map-merchant-panel" class="w-full lg:w-80 bg-white rounded-2xl p-5 border border-slate-200 flex flex-col justify-between">
+              <div>
+                <span class="text-[10px] font-bold uppercase text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded border border-emerald-200" id="merchant-badge">Refill & Cafe</span>
+                <h3 class="font-display font-bold text-base text-slate-900 mt-2" id="merchant-title">Kopi Lestari Eco Hub</h3>
+                <p class="text-xs text-slate-500 mt-1" id="merchant-address">Jl. Senopati No. 42, Kebayoran Baru, Jakarta Selatan</p>
+
+                <div class="mt-4 space-y-2 text-xs">
+                  <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="text-slate-500">Green Reward:</span>
+                    <span class="font-bold text-emerald-600" id="merchant-reward">+50 pts (BYO Tumbler)</span>
+                  </div>
+                  <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="text-slate-500">Est. Carbon Avoided:</span>
+                    <span class="font-bold text-slate-800" id="merchant-carbon">0.24 kg CO2e / cup</span>
+                  </div>
+                  <div class="flex justify-between py-1 border-b border-slate-100">
+                    <span class="text-slate-500">Certification:</span>
+                    <span class="text-teal-700 font-semibold" id="merchant-cert">SanPay Green Partner A</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-4">
+                <button onclick="launchSimFromMerchant()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-xl text-xs transition-all flex items-center justify-center space-x-2 shadow-sm">
+                  <i class="fa-solid fa-calculator"></i>
+                  <span>Simulate Purchase Here</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: MISSIONS -->
+      <section id="view-missions" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-display font-bold text-slate-900">Eco Missions</h2>
+          <p class="text-xs text-slate-500">Complete weekly lifestyle missions to level up your Green Score and unlock tier multipliers</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- Mission 1 -->
+          <div class="clean-card p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Weekly Goal</span>
+                <span class="text-xs font-bold text-amber-600">+150 pts</span>
+              </div>
+              <h3 class="font-display font-bold text-base text-slate-900 mt-2">Commute via Transit</h3>
+              <p class="text-xs text-slate-600 mt-1">Take MRT, LRT, or KRL for at least 4 trips this week instead of car-hailing.</p>
+              
+              <div class="mt-4">
+                <div class="flex justify-between text-[11px] text-slate-500 mb-1">
+                  <span>Progress: 3 / 4 trips</span>
+                  <span class="text-emerald-600 font-bold">75%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full rounded-full" style="width: 75%"></div>
+                </div>
+              </div>
+            </div>
+            <button class="mt-5 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition-colors">
+              Log Transit QR
+            </button>
+          </div>
+
+          <!-- Mission 2 -->
+          <div class="clean-card p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-semibold text-teal-700 uppercase tracking-wider">Sustainable Diet</span>
+                <span class="text-xs font-bold text-amber-600">+200 pts</span>
+              </div>
+              <h3 class="font-display font-bold text-base text-slate-900 mt-2">Meatless Mondays</h3>
+              <p class="text-xs text-slate-600 mt-1">Choose vegetarian or plant-based meals on 2 consecutive Mondays.</p>
+              
+              <div class="mt-4">
+                <div class="flex justify-between text-[11px] text-slate-500 mb-1">
+                  <span>Progress: 1 / 2 completed</span>
+                  <span class="text-teal-600 font-bold">50%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-teal-500 h-full rounded-full" style="width: 50%"></div>
+                </div>
+              </div>
+            </div>
+            <button class="mt-5 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition-colors">
+              Simulate Plant Meal
+            </button>
+          </div>
+
+          <!-- Mission 3 -->
+          <div class="clean-card p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-start">
+                <span class="text-xs font-semibold text-emerald-700 uppercase tracking-wider">Zero Waste</span>
+                <span class="text-xs font-bold text-amber-600">+300 pts</span>
+              </div>
+              <h3 class="font-display font-bold text-base text-slate-900 mt-2">Refill Station Explorer</h3>
+              <p class="text-xs text-slate-600 mt-1">Make 3 purchases using your own container or cup at SanPay verified stores.</p>
+              
+              <div class="mt-4">
+                <div class="flex justify-between text-[11px] text-slate-500 mb-1">
+                  <span>Progress: 2 / 3 completed</span>
+                  <span class="text-emerald-600 font-bold">66%</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div class="bg-emerald-500 h-full rounded-full" style="width: 66%"></div>
+                </div>
+              </div>
+            </div>
+            <button class="mt-5 w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition-colors">
+              Find Refill Near Me
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 8: REWARDS -->
+      <section id="view-rewards" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+          <div>
+            <h2 class="text-xl font-display font-bold text-slate-900">Green Rewards Store</h2>
+            <p class="text-xs text-slate-500">Redeem points earned from lower-carbon purchasing choices</p>
+          </div>
+          <div class="bg-white border border-slate-200 px-4 py-2 rounded-xl text-xs flex items-center space-x-2 shadow-sm">
+            <span class="text-slate-500">Available:</span>
+            <span class="font-bold text-amber-600 font-display text-sm"><span id="rewards-point-badge">2,450</span> Green Points</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="clean-card p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 mb-3">
+                <i class="fa-solid fa-mug-hot"></i>
+              </div>
+              <h4 class="font-display font-bold text-sm text-slate-900">Free Oat Latte Voucher</h4>
+              <p class="text-xs text-slate-500 mt-1">Valid at all partner cafes in Jakarta</p>
+              <div class="text-xs font-bold text-amber-600 mt-3">500 Points</div>
+            </div>
+            <button onclick="redeemReward('Oat Latte Voucher', 500)" class="mt-4 w-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition-colors">
+              Redeem
+            </button>
+          </div>
+
+          <div class="clean-card p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-600 mb-3">
+                <i class="fa-solid fa-train-subway"></i>
+              </div>
+              <h4 class="font-display font-bold text-sm text-slate-900">Rp 25.000 MRT Ticket</h4>
+              <p class="text-xs text-slate-500 mt-1">Direct top-up into MRT Jakarta App</p>
+              <div class="text-xs font-bold text-amber-600 mt-3">750 Points</div>
+            </div>
+            <button onclick="redeemReward('MRT Ticket', 750)" class="mt-4 w-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition-colors">
+              Redeem
+            </button>
+          </div>
+
+          <div class="clean-card p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 mb-3">
+                <i class="fa-solid fa-tree"></i>
+              </div>
+              <h4 class="font-display font-bold text-sm text-slate-900">Plant 1 Native Tree</h4>
+              <p class="text-xs text-slate-500 mt-1">Planted in Mount Merapi National Park</p>
+              <div class="text-xs font-bold text-amber-600 mt-3">1,000 Points</div>
+            </div>
+            <button onclick="redeemReward('Plant 1 Tree', 1000)" class="mt-4 w-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition-colors">
+              Redeem
+            </button>
+          </div>
+
+          <div class="clean-card p-5 rounded-3xl flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 mb-3">
+                <i class="fa-solid fa-bolt"></i>
+              </div>
+              <h4 class="font-display font-bold text-sm text-slate-900">PLN Green Energy Token</h4>
+              <p class="text-xs text-slate-500 mt-1">Rp 50.000 off REC certified electricity</p>
+              <div class="text-xs font-bold text-amber-600 mt-3">1,500 Points</div>
+            </div>
+            <button onclick="redeemReward('PLN REC Token', 1500)" class="mt-4 w-full bg-slate-100 hover:bg-emerald-600 hover:text-white text-slate-700 font-semibold py-2.5 rounded-xl text-xs transition-colors">
+              Redeem
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 9: SANPAY AI (CONVERSATIONAL CONSOLE) -->
+      <section id="view-ai" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-display font-bold text-slate-900">SanPay AI Conversational Console</h2>
+          <p class="text-xs text-slate-500">Two-way natural language and voice interaction for financial sustainability inquiries</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Left: Voice Orb & Real-Time Status (5 cols) -->
+          <div class="lg:col-span-5 clean-card p-6 rounded-3xl border-emerald-200 flex flex-col items-center justify-center text-center space-y-5 bg-gradient-to-b from-forest-50/50 to-white">
+            
+            <div class="text-xs uppercase font-bold tracking-widest text-emerald-700">Voice Assistant Ready</div>
+            
+            <!-- Dynamic Voice Orb Button -->
+            <div class="relative py-4">
+              <button id="main-ai-orb" onclick="toggleVoiceListening()" class="w-32 h-32 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white text-3xl shadow-xl shadow-emerald-600/30 transition-all transform hover:scale-105 active:scale-95 focus:outline-none">
+                <i id="main-orb-icon" class="fa-solid fa-microphone"></i>
+              </button>
+            </div>
+
+            <div class="space-y-1">
+              <div id="main-orb-status" class="font-display font-bold text-lg text-slate-900">Tap to Speak</div>
+              <p id="main-orb-sub" class="text-xs text-slate-500 max-w-xs">
+                Ask in Indonesian or English: "What if I spend Rp50,000 on coffee?"
+              </p>
+            </div>
+
+            <!-- Voice Controls: Mute & Interrupt -->
+            <div class="flex items-center space-x-3 pt-2">
+              <button onclick="stopAssistantSpeech()" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:text-rose-600 text-xs flex items-center gap-1.5 transition-colors">
+                <i class="fa-solid fa-stop"></i> Interrupt Speech
+              </button>
+              <button onclick="toggleAudioMute()" id="mute-toggle-btn" class="px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:text-emerald-700 text-xs flex items-center gap-1.5 transition-colors">
+                <i class="fa-solid fa-volume-high"></i> Voice Output: ON
+              </button>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Chat Transcript & Text Fallback (7 cols) -->
+          <div class="lg:col-span-7 clean-card p-6 rounded-3xl flex flex-col h-[520px]">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <span class="text-xs font-semibold text-slate-700">Live Transcript & Context</span>
+              <button onclick="clearChatHistory()" class="text-[11px] text-slate-400 hover:text-rose-500">Clear Transcript</button>
+            </div>
+
+            <!-- Scrollable Messages -->
+            <div id="ai-chat-messages" class="flex-1 overflow-y-auto py-4 space-y-4 pr-2">
+              <!-- Default Welcome Assistant message -->
+              <div class="flex items-start space-x-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-emerald-700 text-xs flex-shrink-0">
+                  <i class="fa-solid fa-leaf"></i>
+                </div>
+                <div class="bg-slate-50 border border-slate-200/80 rounded-2xl rounded-tl-none p-3.5 text-xs text-slate-700 max-w-[85%] leading-relaxed shadow-sm">
+                  Halo! Saya <strong>SanPay AI</strong>. Sebelum Anda melakukan transaksi, tanyakan dampaknya kepada saya. Contoh: <em>"Berapa emisi karbon jika saya pesan makan siang Rp75.000?"</em> atau gunakan mikrofon di sebelah kiri!
+                </div>
+              </div>
+            </div>
+
+            <!-- Text Input Fallback form -->
+            <form onsubmit="handleSendTextMessage(event)" class="pt-3 border-t border-slate-100 flex items-center space-x-2">
+              <input type="text" id="ai-text-input" placeholder="Tanyakan dampak pembelian atau ketik disini..."
+                class="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-emerald-500 focus:bg-white transition-colors">
+              <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-colors flex items-center justify-center shadow-sm">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 10: ANALYTICS -->
+      <section id="view-analytics" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-display font-bold text-slate-900">Aggregated ESG Analytics</h2>
+          <p class="text-xs text-slate-500">Quarterly trend tracking and compliance reporting</p>
+        </div>
+        <div class="clean-card p-6 rounded-3xl space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-display font-bold text-sm text-slate-900">6-Month Carbon Reduction Curve</h3>
+            <span class="text-xs text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-md">-24.2% total drop</span>
+          </div>
+          <div class="h-44 w-full flex items-end justify-between gap-2 pt-6 px-4 bg-slate-50 rounded-2xl">
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="w-full bg-slate-200 rounded-t h-36"></div>
+              <span class="text-[10px] text-slate-500 font-medium">May (58kg)</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="w-full bg-slate-200 rounded-t h-32"></div>
+              <span class="text-[10px] text-slate-500 font-medium">Jun (52kg)</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="w-full bg-slate-200 rounded-t h-28"></div>
+              <span class="text-[10px] text-slate-500 font-medium">Jul (49kg)</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="w-full bg-slate-200 rounded-t h-26"></div>
+              <span class="text-[10px] text-slate-500 font-medium">Aug (46kg)</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="w-full bg-slate-200 rounded-t h-24"></div>
+              <span class="text-[10px] text-slate-500 font-medium">Sep (44kg)</span>
+            </div>
+            <div class="flex-1 flex flex-col items-center gap-2">
+              <div class="w-full bg-emerald-500 rounded-t h-20 shadow-md shadow-emerald-500/20"></div>
+              <span class="text-[10px] text-emerald-700 font-bold">Oct (42.8kg)</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 11: PARTNER -->
+      <section id="view-partner" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-display font-bold text-slate-900">SanPay Partner Portal</h2>
+          <p class="text-xs text-slate-500">Green merchant verification API and carbon emission factor registry</p>
+        </div>
+
+        <div class="clean-card p-6 rounded-3xl space-y-4">
+          <h3 class="font-display font-bold text-sm text-slate-900">Emission Factor Registry (Engine Database)</h3>
+          <p class="text-xs text-slate-500">Open transparent factors utilized across simulations and completed transactions</p>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 text-[10px] uppercase border-b border-slate-200">
+                <tr>
+                  <th class="p-3">Category Code</th>
+                  <th class="p-3">Factor Value</th>
+                  <th class="p-3">Calculation Unit</th>
+                  <th class="p-3">Benchmark Source</th>
+                  <th class="p-3">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-700">
+                <tr>
+                  <td class="p-3 font-semibold text-emerald-700">FOOD_CONV_BEEF</td>
+                  <td class="p-3 font-mono font-bold">0.0416</td>
+                  <td class="p-3">kg CO2e / IDR</td>
+                  <td class="p-3">BPS Indonesia Food Matrix 2024</td>
+                  <td class="p-3"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-semibold">Active</span></td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-emerald-700">FOOD_ALT_VEG</td>
+                  <td class="p-3 font-mono font-bold">0.0124</td>
+                  <td class="p-3">kg CO2e / IDR</td>
+                  <td class="p-3">IPCC Agroforestry WG3</td>
+                  <td class="p-3"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-semibold">Active</span></td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-emerald-700">RIDE_CONV_CAR</td>
+                  <td class="p-3 font-mono font-bold">0.000185</td>
+                  <td class="p-3">kg CO2e / IDR (≈0.185kg/km)</td>
+                  <td class="p-3">Ministry of Energy & Mineral Resources RI</td>
+                  <td class="p-3"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-semibold">Active</span></td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-semibold text-emerald-700">TRANS_MRT_EV</td>
+                  <td class="p-3 font-mono font-bold">0.000032</td>
+                  <td class="p-3">kg CO2e / IDR</td>
+                  <td class="p-3">PT MRT Jakarta Sustainability 2024</td>
+                  <td class="p-3"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-semibold">Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<!-- DEDICATED VOICE MODAL OVERLAY -->
+<div id="voice-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+  <div class="bg-white max-w-lg w-full rounded-3xl p-6 sm:p-8 border border-emerald-200 relative shadow-2xl flex flex-col items-center text-center">
+    
+    <!-- Close button -->
+    <button onclick="closeVoiceModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-800 p-2">
+      <i class="fa-solid fa-xmark text-lg"></i>
+    </button>
+
+    <div class="text-xs uppercase font-bold tracking-widest text-emerald-700 mb-2">SanPay Voice Assistant</div>
+    <h3 class="font-display font-bold text-xl text-slate-900">Ask Before You Spend</h3>
+
+    <!-- Interactive Glowing Voice Orb -->
+    <div class="my-8 relative">
+      <div id="modal-orb-halo" class="absolute inset-0 rounded-full bg-emerald-200/50 blur-xl scale-125 transition-transform"></div>
+      <button id="modal-voice-orb" onclick="toggleVoiceListening()" class="relative w-28 h-28 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-500 flex items-center justify-center text-white text-3xl shadow-xl shadow-emerald-600/30 transition-all transform active:scale-90">
+        <i id="modal-orb-icon" class="fa-solid fa-microphone text-white"></i>
+      </button>
+    </div>
+
+    <!-- Live Status Label -->
+    <div id="voice-state-title" class="font-display font-bold text-lg text-slate-900">Click Orb to Speak</div>
+    <p id="voice-state-sub" class="text-xs text-slate-500 mt-1 max-w-xs">
+      Try saying: "I want to spend Rp100,000 on lunch. Can I choose a lower-carbon option?"
+    </p>
+
+    <!-- Real-time Speech Transcript Bubble -->
+    <div class="w-full mt-6 bg-slate-50 border border-slate-200 rounded-2xl p-4 text-left">
+      <div class="text-[10px] text-slate-400 uppercase font-semibold mb-1">Live Recognized Speech</div>
+      <p id="modal-speech-transcript" class="text-xs text-slate-800 italic min-h-[36px]">
+        (Listening will appear here...)
+      </p>
+    </div>
+
+    <!-- AI Voice Response Stream Bubble -->
+    <div id="modal-ai-reply-box" class="w-full mt-3 bg-mint-50 border border-emerald-200 rounded-2xl p-4 text-left hidden">
+      <div class="flex items-center justify-between text-[10px] text-emerald-800 uppercase font-bold mb-1">
+        <span>SanPay AI Response</span>
+        <button onclick="stopAssistantSpeech()" class="text-slate-500 hover:text-slate-800"><i class="fa-solid fa-volume-xmark"></i> Stop</button>
+      </div>
+      <p id="modal-ai-reply-text" class="text-xs text-slate-700 leading-relaxed"></p>
+      
+      <!-- Instant Simulation Card Insertion in Modal -->
+      <div id="modal-simulation-card" class="mt-3 pt-3 border-t border-emerald-200 hidden">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-700 font-semibold" id="modal-sim-summary">Est. Avoided: 5.06 kg CO2e</span>
+          <span class="text-amber-600 font-bold" id="modal-sim-pts">+120 pts</span>
+        </div>
+        <button onclick="viewGeneratedSimulationFromModal()" class="mt-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-xl text-xs shadow-sm">
+          View Full Impact Breakdown
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal Footer Controls -->
+    <div class="mt-6 flex items-center justify-between w-full pt-4 border-t border-slate-100 text-xs">
+      <button onclick="switchModalToTextFallback()" class="text-slate-500 hover:text-emerald-700 flex items-center gap-1.5 font-medium">
+        <i class="fa-solid fa-keyboard"></i> Switch to Typing
+      </button>
+      <span class="text-[11px] text-slate-400">ID / EN Auto-Detect</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- NOTIFICATION TOAST -->
+<div id="toast" class="fixed bottom-5 right-5 bg-white border border-emerald-300 text-slate-900 px-4 py-3 rounded-2xl shadow-xl flex items-center space-x-3 text-xs z-50 transform translate-y-20 opacity-0 transition-all duration-300">
+  <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center">
+    <i class="fa-solid fa-check"></i>
+  </div>
+  <span id="toast-message" class="font-medium">Message text</span>
+</div>
+
+<script>
+/**
+ * SANPAY GREEN FINOS — WHITE & EMERALD EDITION
+ * Cookie-Compatible Auth Gate, Calculation Engine, Web Speech AI, and Router
+ */
+
+// Core Application State
+const state = {
+  isAuthenticated: false,
+  activeView: 'dashboard',
+  isDemoMode: true,
+  audioMuted: false,
+  voiceState: 'idle', // 'idle' | 'listening' | 'processing' | 'speaking' | 'error'
+  currentUser: {
+    name: 'Alya Nabila',
+    email: 'alya.nabila@sanpay.eco',
+    greenScore: 842,
+    greenPoints: 2450,
+    balanceIdr: 8450000
+  },
+  currentSimulation: {
+    id: 'sim-init',
+    desc: 'Lunch steak meal package with coworkers',
+    category: 'food',
+    origAmount: 150000,
+    altAmount: 95000,
+    origName: 'Red Meat (Beef Meal)',
+    altName: 'Local Plant-based Rice Bowl',
+    origCarbon: 6.24,
+    altCarbon: 1.18,
+    carbonAvoided: 5.06,
+    carbonPct: 81.1,
+    moneySaved: 55000,
+    potentialPoints: 120,
+    assumption: 'BPS Indonesia Food Emission Index 2024 (0.0416 kg CO2e/IDR vs 0.0124)',
+    confidence: 'High (88%)',
+    timestamp: new Date().toISOString()
+  },
+  savedSimulations: [
+    {
+      id: 'sim-101',
+      desc: 'Office commute Senayan to Thamrin',
+      category: 'ride',
+      origAmount: 48000,
+      altAmount: 14000,
+      origName: 'Private Car Ride-hail',
+      altName: 'MRT Jakarta Metro Line',
+      origCarbon: 4.2,
+      altCarbon: 0.6,
+      carbonAvoided: 3.6,
+      potentialPoints: 80,
+      timestamp: 'Today, 08:30 WIB'
+    },
+    {
+      id: 'sim-102',
+      desc: 'Afternoon Iced Cappuccino with tumbler',
+      category: 'food',
+      origAmount: 45000,
+      altAmount: 40000,
+      origName: 'Disposable Single-use Cup',
+      altName: 'BYO Reusable Tumbler at Kopi Lestari',
+      origCarbon: 0.38,
+      altCarbon: 0.08,
+      carbonAvoided: 0.30,
+      potentialPoints: 50,
+      timestamp: 'Yesterday, 15:10 WIB'
+    }
+  ],
+  transactions: [
+    {
+      id: 'TX-9821',
+      merchant: 'MRT Jakarta Bundaran HI',
+      category: 'transport',
+      amount: 14000,
+      carbon: 0.45,
+      method: 'Activity-based (14 km rail)',
+      source: 'PT MRT Sustainability 2024',
+      points: 40,
+      date: 'Today, 09:15 WIB'
+    },
+    {
+      id: 'TX-9819',
+      merchant: 'Kopi Kenangan Lestari',
+      category: 'food',
+      amount: 42000,
+      carbon: 0.28,
+      method: 'Refill Verified Discount',
+      source: 'SanPay Partner Audit',
+      points: 50,
+      date: 'Yesterday, 14:20 WIB'
+    },
+    {
+      id: 'TX-9780',
+      merchant: 'Carrefour Kemang (Groceries)',
+      category: 'retail',
+      amount: 320000,
+      carbon: 8.60,
+      method: 'Monetary Factor proxy',
+      source: 'BPS Indonesia Consumption 2024',
+      points: 15,
+      date: '15 Oct, 18:30 WIB'
+    },
+    {
+      id: 'TX-9755',
+      merchant: 'Bluebird EV Taxi',
+      category: 'ride',
+      amount: 85000,
+      carbon: 1.85,
+      method: 'Activity-based (Electric Fleet)',
+      source: 'MEMR RI Fleet Index',
+      points: 75,
+      date: '14 Oct, 20:00 WIB'
+    }
+  ]
+};
+
+/**
+ * AUTHENTICATION CONTROLLER (HttpOnly Security Model Simulator)
+ */
+function handleAuthLogin(event) {
+  event.preventDefault();
+  const btn = document.getElementById('login-btn');
+  btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Authenticating...`;
+
+  setTimeout(() => {
+    state.isAuthenticated = true;
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
+    btn.innerHTML = `<span>Authenticate & Access FinOS</span> <i class="fa-solid fa-arrow-right text-xs"></i>`;
+    showToast("Welcome to SanPay FinOS, Alya Nabila!");
+    renderDashboardSimulations();
+    renderDashboardTransactions();
+    renderFullTransactions();
+    syncSimulationViewData();
+  }, 600);
+}
+
+function handleAuthLogout() {
+  state.isAuthenticated = false;
+  document.getElementById('main-app').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+  showToast("Session safely terminated.");
+}
+
+/**
+ * CARBON CALCULATION ENGINE & EMISSION FACTORS
+ */
+const CarbonEngine = {
+  factors: {
+    food: {
+      convFactor: 0.0416, // kg CO2e per IDR 1,000 equivalent for high meat
+      altFactor: 0.0124,  // kg CO2e per IDR 1,000 for plant-based / local
+      defaultAltName: 'Plant-Based / Locally-Sourced Meal',
+      unit: 'kg CO2e / IDR',
+      source: 'BPS Indonesia Food Matrix 2024 & IPCC WG3',
+      confidence: 'High (88%)'
+    },
+    ride: {
+      convFactor: 0.0875,
+      altFactor: 0.0125,
+      defaultAltName: 'MRT Electric Rail / EV Fleet',
+      unit: 'kg CO2e / IDR',
+      source: 'Ministry of Energy & Mineral Resources RI 2024',
+      confidence: 'High (92%)'
+    },
+    transport: {
+      convFactor: 0.0450,
+      altFactor: 0.0080,
+      defaultAltName: 'Bus Rapid Transit (Electric TransJakarta)',
+      unit: 'kg CO2e / IDR',
+      source: 'DKI Transportation Agency 2024',
+      confidence: 'High (95%)'
+    },
+    retail: {
+      convFactor: 0.0270,
+      altFactor: 0.0110,
+      defaultAltName: 'Eco-certified Recycled Material Goods',
+      unit: 'kg CO2e / IDR',
+      source: 'Ministry of Industry RI Life-Cycle Assessment',
+      confidence: 'Moderate (74%)'
+    },
+    utilities: {
+      convFactor: 0.0650,
+      altFactor: 0.0050,
+      defaultAltName: 'PLN Renewable Energy Certificate (REC)',
+      unit: 'kg CO2e / IDR',
+      source: 'PLN RUPTL Clean Energy Transition',
+      confidence: 'High (94%)'
+    },
+    travel: {
+      convFactor: 0.0950,
+      altFactor: 0.0350,
+      defaultAltName: 'Eco-Certified Green Lodging & High-Speed Rail',
+      unit: 'kg CO2e / IDR',
+      source: 'ICAO Carbon Calculator & Kemenparekraf',
+      confidence: 'Moderate (78%)'
+    },
+    lifestyle: {
+      convFactor: 0.0300,
+      altFactor: 0.0100,
+      defaultAltName: 'Circular Reusable Service',
+      unit: 'kg CO2e / IDR',
+      source: 'Indonesian Circular Economy Benchmark',
+      confidence: 'Moderate (70%)'
+    }
+  },
+
+  calculateSimulation(category, amountIdr, customAltPrice = null) {
+    const catData = this.factors[category] || this.factors.food;
+    const baseAmount = Math.max(1000, Number(amountIdr) || 50000);
+    const altAmount = customAltPrice !== null && customAltPrice !== '' ? Number(customAltPrice) : Math.round(baseAmount * 0.75);
+
+    const origCarbon = Number(((baseAmount / 1000) * catData.convFactor).toFixed(2));
+    const altCarbon = Number(((altAmount / 1000) * catData.altFactor).toFixed(2));
+    const carbonAvoided = Number(Math.max(0, origCarbon - altCarbon).toFixed(2));
+    const carbonPct = origCarbon > 0 ? Number(((carbonAvoided / origCarbon) * 100).toFixed(1)) : 0;
+    const moneySaved = Math.max(0, baseAmount - altAmount);
+
+    const points = Math.round(20 + (carbonAvoided * 20));
+
+    return {
+      origCarbon,
+      altCarbon,
+      carbonAvoided,
+      carbonPct,
+      moneySaved,
+      points,
+      assumption: `${catData.source} (Factor: ${catData.convFactor} vs ${catData.altFactor} ${catData.unit})`,
+      confidence: catData.confidence
+    };
+  }
+};
+
+/**
+ * SANPAY VOICE AI ASSISTANT (WEB SPEECH API)
+ */
+let speechRecognition = null;
+let speechSynth = window.speechSynthesis;
+let isRecognizing = false;
+
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) return null;
+
+  const recognizer = new SpeechRecognition();
+  recognizer.continuous = false;
+  recognizer.interimResults = true;
+  recognizer.lang = 'id-ID';
+
+  recognizer.onstart = () => {
+    isRecognizing = true;
+    updateVoiceUIState('listening');
+  };
+
+  recognizer.onresult = (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; ++i) {
+      transcript += event.results[i][0].transcript;
+    }
+    document.getElementById('modal-speech-transcript').innerText = `"${transcript}"`;
+    if (event.results[0].isFinal) {
+      processUserVoiceInput(transcript);
+    }
+  };
+
+  recognizer.onerror = () => {
+    isRecognizing = false;
+    updateVoiceUIState('idle');
+    showToast("Voice recognition stopped.");
+  };
+
+  recognizer.onend = () => {
+    isRecognizing = false;
+    if (state.voiceState === 'listening') updateVoiceUIState('idle');
+  };
+
+  return recognizer;
+}
+
+speechRecognition = initSpeechRecognition();
+
+function toggleVoiceListening() {
+  if (!speechRecognition) {
+    showToast("Voice recognition not supported in browser. Use typing!");
+    openVoiceModal();
+    switchModalToTextFallback();
+    return;
+  }
+
+  if (speechSynth && speechSynth.speaking) speechSynth.cancel();
+
+  if (isRecognizing) {
+    speechRecognition.stop();
+    isRecognizing = false;
+    updateVoiceUIState('idle');
+  } else {
+    try {
+      speechRecognition.start();
+    } catch (e) {
+      speechRecognition.stop();
+      setTimeout(() => speechRecognition.start(), 200);
+    }
+  }
+}
+
+function updateVoiceUIState(newState) {
+  state.voiceState = newState;
+  const orb = document.getElementById('main-ai-orb');
+  const modalOrb = document.getElementById('modal-voice-orb');
+  const statusLabel = document.getElementById('main-orb-status');
+  const modalTitle = document.getElementById('voice-state-title');
+  const modalHalo = document.getElementById('modal-orb-halo');
+
+  if (newState === 'listening') {
+    if (orb) orb.className = 'w-32 h-32 rounded-full bg-emerald-500 flex items-center justify-center text-white text-3xl shadow-xl orb-listening cursor-pointer';
+    if (modalOrb) modalOrb.className = 'relative w-28 h-28 rounded-full bg-emerald-500 flex items-center justify-center text-white text-3xl shadow-xl orb-listening cursor-pointer';
+    if (statusLabel) statusLabel.innerText = "Listening to you...";
+    if (modalTitle) modalTitle.innerText = "Listening... Speak Now";
+    if (modalHalo) modalHalo.className = 'absolute inset-0 rounded-full bg-emerald-300/60 blur-xl scale-150 transition-all';
+  } else if (newState === 'processing') {
+    if (statusLabel) statusLabel.innerText = "Calculating with SanPay Engine...";
+    if (modalTitle) modalTitle.innerText = "Calculating Impact...";
+  } else if (newState === 'speaking') {
+    if (statusLabel) statusLabel.innerText = "SanPay AI Speaking...";
+    if (modalTitle) modalTitle.innerText = "SanPay AI Speaking";
+  } else {
+    if (orb) orb.className = 'w-32 h-32 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white text-3xl shadow-xl shadow-emerald-600/30 transition-all transform hover:scale-105 active:scale-95 cursor-pointer';
+    if (modalOrb) modalOrb.className = 'relative w-28 h-28 rounded-full bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-500 flex items-center justify-center text-white text-3xl shadow-xl shadow-emerald-600/30 transition-all transform active:scale-90 cursor-pointer';
+    if (statusLabel) statusLabel.innerText = "Tap to Speak";
+    if (modalTitle) modalTitle.innerText = "Click Orb to Speak";
+    if (modalHalo) modalHalo.className = 'absolute inset-0 rounded-full bg-emerald-200/50 blur-xl scale-125 transition-transform';
+  }
+}
+
+function processUserVoiceInput(transcript) {
+  updateVoiceUIState('processing');
+  appendChatMessage('user', transcript);
+
+  const lower = transcript.toLowerCase();
+  let amount = 100000;
+  let category = 'food';
+
+  const amountMatch = lower.match(/(\d+[\d.,]*)\s*(ribu|k|jt|juta|rb)?/);
+  if (amountMatch) {
+    let rawNum = parseFloat(amountMatch[1].replace(/\./g, '').replace(/,/g, '.'));
+    let multiplier = amountMatch[2];
+    if (multiplier === 'ribu' || multiplier === 'rb' || multiplier === 'k') rawNum *= 1000;
+    if (multiplier === 'juta' || multiplier === 'jt') rawNum *= 1000000;
+    if (rawNum > 1000) amount = rawNum;
+  }
+
+  if (lower.includes('kopi') || lower.includes('coffee') || lower.includes('makan') || lower.includes('lunch') || lower.includes('dinner') || lower.includes('restoran')) {
+    category = 'food';
+  } else if (lower.includes('taksi') || lower.includes('grab') || lower.includes('gojek') || lower.includes('ride') || lower.includes('ojek')) {
+    category = 'ride';
+  } else if (lower.includes('kereta') || lower.includes('mrt') || lower.includes('bus') || lower.includes('trans')) {
+    category = 'transport';
+  } else if (lower.includes('baju') || lower.includes('sepatu') || lower.includes('mall') || lower.includes('belanja')) {
+    category = 'retail';
+  }
+
+  const altPrice = Math.round(amount * 0.7);
+  const result = CarbonEngine.calculateSimulation(category, amount, altPrice);
+
+  state.currentSimulation = {
+    id: 'sim-' + Date.now(),
+    desc: transcript,
+    category: category,
+    origAmount: amount,
+    altAmount: altPrice,
+    origName: `Conventional ${category.toUpperCase()} Choice`,
+    altName: CarbonEngine.factors[category].defaultAltName,
+    origCarbon: result.origCarbon,
+    altCarbon: result.altCarbon,
+    carbonAvoided: result.carbonAvoided,
+    carbonPct: result.carbonPct,
+    moneySaved: result.moneySaved,
+    potentialPoints: result.points,
+    assumption: result.assumption,
+    confidence: result.confidence,
+    timestamp: 'Just now'
+  };
+
+  syncSimulationViewData();
+
+  const isIndo = lower.includes('saya') || lower.includes('beli') || lower.includes('berapa') || lower.includes('mau');
+  
+  let responseText = "";
+  if (isIndo) {
+    responseText = `Berdasarkan SanPay Carbon Engine, estimasi pembelian Rp${amount.toLocaleString('id-ID')} ini menghasilkan ${result.origCarbon} kg CO2e. Jika kamu beralih ke alternatif ramah lingkungan (${state.currentSimulation.altName}), emisinya hanya ${result.altCarbon} kg CO2e — potensi pengurangan sebesar ${result.carbonAvoided} kg CO2e (${result.carbonPct}%). Kamu juga menghemat Rp${result.moneySaved.toLocaleString('id-ID')} dan mendapatkan estimasi ${result.points} Green Points!`;
+  } else {
+    responseText = `Based on the SanPay calculation engine, spending Rp${amount.toLocaleString('id-ID')} generates approx ${result.origCarbon} kg CO2e. Switching to a sustainable option (${state.currentSimulation.altName}) produces only ${result.altCarbon} kg CO2e—saving ${result.carbonAvoided} kg CO2e (${result.carbonPct}%). You also save Rp${result.moneySaved.toLocaleString('id-ID')} and earn ${result.points} Green Points!`;
+  }
+
+  setTimeout(() => {
+    updateVoiceUIState('speaking');
+    appendChatMessage('assistant', responseText);
+    
+    const replyBox = document.getElementById('modal-ai-reply-box');
+    const replyText = document.getElementById('modal-ai-reply-text');
+    const simCard = document.getElementById('modal-simulation-card');
+    const simSummary = document.getElementById('modal-sim-summary');
+    const simPts = document.getElementById('modal-sim-pts');
+
+    if (replyBox && replyText) {
+      replyBox.classList.remove('hidden');
+      replyText.innerText = responseText;
+      if (simCard) {
+        simCard.classList.remove('hidden');
+        simSummary.innerText = `Avoided: ${result.carbonAvoided} kg CO2e (${result.carbonPct}%)`;
+        simPts.innerText = `+${result.points} pts`;
+      }
+    }
+
+    speakAloud(responseText);
+  }, 400);
+}
+
+function speakAloud(text) {
+  if (state.audioMuted || !speechSynth) {
+    updateVoiceUIState('idle');
+    return;
+  }
+  if (speechSynth.speaking) speechSynth.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'id-ID';
+  utterance.rate = 1.05;
+  utterance.pitch = 1.0;
+  utterance.onend = () => updateVoiceUIState('idle');
+  utterance.onerror = () => updateVoiceUIState('idle');
+  speechSynth.speak(utterance);
+}
+
+function stopAssistantSpeech() {
+  if (speechSynth && speechSynth.speaking) speechSynth.cancel();
+  updateVoiceUIState('idle');
+}
+
+function toggleAudioMute() {
+  state.audioMuted = !state.audioMuted;
+  const btn = document.getElementById('mute-toggle-btn');
+  if (state.audioMuted) {
+    if (speechSynth.speaking) speechSynth.cancel();
+    btn.innerHTML = `<i class="fa-solid fa-volume-xmark text-rose-600"></i> Voice Output: MUTED`;
+    showToast("Voice playback muted");
+  } else {
+    btn.innerHTML = `<i class="fa-solid fa-volume-high text-emerald-700"></i> Voice Output: ON`;
+    showToast("Voice playback enabled");
+  }
+}
+
+/**
+ * SIMULATOR VIEW HANDLERS
+ */
+function handleRunSimulation(event) {
+  event.preventDefault();
+  const desc = document.getElementById('sim-desc').value;
+  const amount = parseFloat(document.getElementById('sim-amount').value);
+  const category = document.getElementById('sim-category').value;
+  const baseline = document.getElementById('sim-baseline').value;
+  const alt = document.getElementById('sim-alternative').value;
+  const altPrice = document.getElementById('sim-alt-price').value;
+
+  const result = CarbonEngine.calculateSimulation(category, amount, altPrice);
+
+  state.currentSimulation = {
+    id: 'sim-' + Date.now(),
+    desc: desc,
+    category: category,
+    origAmount: amount,
+    altAmount: altPrice ? Number(altPrice) : Math.round(amount * 0.7),
+    origName: baseline,
+    altName: alt,
+    origCarbon: result.origCarbon,
+    altCarbon: result.altCarbon,
+    carbonAvoided: result.carbonAvoided,
+    carbonPct: result.carbonPct,
+    moneySaved: result.moneySaved,
+    potentialPoints: result.points,
+    assumption: result.assumption,
+    confidence: result.confidence,
+    timestamp: 'Just now'
+  };
+
+  syncSimulationViewData();
+  showToast("Pre-transaction impact calculated!");
+}
+
+function syncSimulationViewData() {
+  const sim = state.currentSimulation;
+  
+  document.getElementById('res-orig-name').innerText = sim.origName;
+  document.getElementById('res-orig-cost').innerText = `Rp ${sim.origAmount.toLocaleString('id-ID')}`;
+  document.getElementById('res-orig-carbon').innerText = `${sim.origCarbon} kg CO2e`;
+  document.getElementById('res-orig-points').innerText = `0 pts`;
+
+  document.getElementById('res-alt-name').innerText = sim.altName;
+  document.getElementById('res-alt-cost').innerText = `Rp ${sim.altAmount.toLocaleString('id-ID')}`;
+  document.getElementById('res-alt-carbon').innerText = `${sim.altCarbon} kg CO2e`;
+  document.getElementById('res-alt-points').innerText = `+${sim.potentialPoints} pts`;
+
+  document.getElementById('res-carbon-avoided').innerText = `-${sim.carbonAvoided} kg`;
+  document.getElementById('res-carbon-pct').innerText = `(${sim.carbonPct}% less)`;
+  document.getElementById('res-money-saved').innerText = `Rp ${sim.moneySaved.toLocaleString('id-ID')}`;
+  document.getElementById('res-total-points').innerText = `+${sim.potentialPoints} pts`;
+
+  document.getElementById('res-ai-recommendation').innerText = 
+    `By selecting "${sim.altName}" over the conventional option, you prevent ${sim.carbonAvoided} kg CO2e from entering the atmosphere and claim ${sim.potentialPoints} Green Points.`;
+  document.getElementById('res-assumptions').innerText = sim.assumption;
+  document.getElementById('res-confidence').innerText = `Data Confidence: ${sim.confidence}`;
+
+  if (document.getElementById('sim-desc')) document.getElementById('sim-desc').value = sim.desc;
+  if (document.getElementById('sim-amount')) document.getElementById('sim-amount').value = sim.origAmount;
+  if (document.getElementById('sim-category')) document.getElementById('sim-category').value = sim.category;
+  if (document.getElementById('sim-baseline')) document.getElementById('sim-baseline').value = sim.origName;
+  if (document.getElementById('sim-alternative')) document.getElementById('sim-alternative').value = sim.altName;
+  if (document.getElementById('sim-alt-price')) document.getElementById('sim-alt-price').value = sim.altAmount;
+}
+
+function autoSuggestAlternative() {
+  const cat = document.getElementById('sim-category').value;
+  const factorInfo = CarbonEngine.factors[cat];
+  document.getElementById('sim-alternative').value = factorInfo.defaultAltName;
+  const currentAmt = parseFloat(document.getElementById('sim-amount').value) || 50000;
+  document.getElementById('sim-alt-price').value = Math.round(currentAmt * 0.75);
+  showToast("Suggested certified green alternative!");
+}
+
+function onCategoryChange() {
+  const cat = document.getElementById('sim-category').value;
+  const factorInfo = CarbonEngine.factors[cat];
+  document.getElementById('sim-alternative').value = factorInfo.defaultAltName;
+}
+
+function askAIAboutSimulation() {
+  const sim = state.currentSimulation;
+  navigateTo('ai');
+  const question = `Can you explain the environmental difference between my choice "${sim.origName}" and "${sim.altName}"?`;
+  document.getElementById('ai-text-input').value = question;
+  handleSendTextMessage(new Event('submit'));
+}
+
+function saveCurrentSimulation() {
+  const sim = { ...state.currentSimulation, id: 'sim-' + Date.now(), timestamp: 'Saved just now' };
+  state.savedSimulations.unshift(sim);
+  renderDashboardSimulations();
+  showToast("Simulation stored in history (No money charged)");
+}
+
+/**
+ * DASHBOARD & TRANSACTIONS RENDERERS
+ */
+function renderDashboardSimulations() {
+  const container = document.getElementById('dashboard-simulations-list');
+  if (!container) return;
+
+  container.innerHTML = state.savedSimulations.slice(0, 3).map(s => `
+    <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-emerald-300 transition-colors flex items-center justify-between">
+      <div class="space-y-0.5 max-w-[65%]">
+        <div class="flex items-center space-x-2">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200">
+            ${s.category.toUpperCase()}
+          </span>
+          <span class="text-[11px] text-slate-500">${s.timestamp}</span>
+        </div>
+        <h4 class="text-xs font-semibold text-slate-900 truncate">${s.desc}</h4>
+        <p class="text-[11px] text-slate-500 truncate">Swap: <span class="text-emerald-700 font-medium">${s.altName}</span></p>
+      </div>
+
+      <div class="text-right">
+        <span class="text-xs font-bold font-display text-emerald-600 block">-${s.carbonAvoided} kg CO2e</span>
+        <span class="text-[10px] text-amber-600 font-bold">+${s.potentialPoints} pts</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDashboardTransactions() {
+  const container = document.getElementById('dashboard-transactions-list');
+  if (!container) return;
+
+  container.innerHTML = state.transactions.slice(0, 4).map(tx => `
+    <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between">
+      <div class="space-y-0.5">
+        <h4 class="text-xs font-semibold text-slate-900 truncate max-w-[140px]">${tx.merchant}</h4>
+        <span class="text-[10px] text-slate-500">${tx.date}</span>
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-semibold text-slate-900 block">Rp ${tx.amount.toLocaleString('id-ID')}</span>
+        <span class="text-[10px] text-emerald-600 font-bold">${tx.carbon} kg CO2e</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFullTransactions(filter = 'all') {
+  const body = document.getElementById('full-transactions-body');
+  if (!body) return;
+
+  const filtered = filter === 'all' 
+    ? state.transactions 
+    : state.transactions.filter(t => t.category === filter);
+
+  body.innerHTML = filtered.map(tx => `
+    <tr class="hover:bg-slate-50 transition-colors">
+      <td class="px-5 py-3.5 font-semibold text-slate-900">${tx.merchant}</td>
+      <td class="px-5 py-3.5"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] uppercase font-bold">${tx.category}</span></td>
+      <td class="px-5 py-3.5 font-display font-semibold text-slate-900">Rp ${tx.amount.toLocaleString('id-ID')}</td>
+      <td class="px-5 py-3.5 text-emerald-600 font-bold">${tx.carbon} kg CO2e</td>
+      <td class="px-5 py-3.5 text-slate-500 text-[11px]">${tx.method} <br><span class="text-[9px] text-slate-400">${tx.source}</span></td>
+      <td class="px-5 py-3.5 text-amber-600 font-bold">+${tx.points} pts</td>
+      <td class="px-5 py-3.5 text-slate-500">${tx.date}</td>
+    </tr>
+  `).join('');
+}
+
+function filterTransactions() {
+  const val = document.getElementById('tx-filter').value;
+  renderFullTransactions(val);
+}
+
+/**
+ * GREEN MAP INTERACTION
+ */
+const mapMerchants = [
+  {
+    title: "Kopi Lestari Eco Hub",
+    address: "Jl. Senopati No. 42, Kebayoran Baru, Jakarta Selatan",
+    badge: "Refill & Cafe",
+    reward: "+50 pts (BYO Tumbler)",
+    carbon: "0.24 kg CO2e / cup",
+    cert: "SanPay Green Partner A",
+    category: "food"
+  },
+  {
+    title: "MRT Senayan Station Hub",
+    address: "Kawasan Gelora Bung Karno, Jakarta Pusat",
+    badge: "Clean Transit",
+    reward: "+40 pts per commute",
+    carbon: "3.4 kg CO2e avoided vs car",
+    cert: "ISO 14001 Low Emission",
+    category: "transport"
+  },
+  {
+    title: "Cleanomic Zero-Waste Bulk Store",
+    address: "Panglima Polim V No. 12, Melawai, Jakarta Selatan",
+    badge: "Zero Waste Grocer",
+    reward: "+100 pts on refill purchases",
+    carbon: "1.8 kg CO2e / kg package",
+    cert: "Certified Organic & Bulk",
+    category: "retail"
+  }
+];
+
+function selectMapMerchant(idx) {
+  const m = mapMerchants[idx];
+  document.getElementById('merchant-title').innerText = m.title;
+  document.getElementById('merchant-address').innerText = m.address;
+  document.getElementById('merchant-badge').innerText = m.badge;
+  document.getElementById('merchant-reward').innerText = m.reward;
+  document.getElementById('merchant-carbon').innerText = m.carbon;
+  document.getElementById('merchant-cert').innerText = m.cert;
+}
+
+function launchSimFromMerchant() {
+  const title = document.getElementById('merchant-title').innerText;
+  navigateTo('simulator');
+  document.getElementById('sim-desc').value = `Eco visit at ${title}`;
+  document.getElementById('sim-baseline').value = `Standard single-use plastic package`;
+  document.getElementById('sim-alternative').value = `Zero-waste refill verified at ${title}`;
+  handleRunSimulation(new Event('submit'));
+}
+
+/**
+ * CHAT MESSAGE UTILITIES
+ */
+function appendChatMessage(role, text) {
+  const container = document.getElementById('ai-chat-messages');
+  if (!container) return;
+
+  const isUser = role === 'user';
+  const div = document.createElement('div');
+  div.className = `flex items-start space-x-3 ${isUser ? 'flex-row-reverse space-x-reverse' : ''}`;
+  
+  div.innerHTML = `
+    <div class="w-8 h-8 rounded-xl ${isUser ? 'bg-slate-200 text-slate-800' : 'bg-emerald-100 text-emerald-800'} flex items-center justify-center text-xs flex-shrink-0">
+      <i class="fa-solid ${isUser ? 'fa-user' : 'fa-leaf'}"></i>
+    </div>
+    <div class="${isUser ? 'bg-emerald-600 text-white font-medium' : 'bg-slate-50 border border-slate-200/80 text-slate-700'} rounded-2xl ${isUser ? 'rounded-tr-none' : 'rounded-tl-none'} p-3.5 text-xs max-w-[85%] leading-relaxed shadow-sm">
+      ${text}
+    </div>
+  `;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function handleSendTextMessage(event) {
+  event.preventDefault();
+  const input = document.getElementById('ai-text-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  processUserVoiceInput(text);
+}
+
+function clearChatHistory() {
+  const container = document.getElementById('ai-chat-messages');
+  container.innerHTML = '';
+  appendChatMessage('assistant', 'Chat transcript cleared. How can I help evaluate your next purchase?');
+}
+
+/**
+ * MODAL NAVIGATION & CONTROLS
+ */
+function openVoiceModal() {
+  document.getElementById('voice-modal').classList.remove('hidden');
+  document.getElementById('modal-speech-transcript').innerText = "(Tap orb and speak...)";
+}
+
+function closeVoiceModal() {
+  document.getElementById('voice-modal').classList.add('hidden');
+  if (speechRecognition && isRecognizing) speechRecognition.stop();
+  if (speechSynth && speechSynth.speaking) speechSynth.cancel();
+  updateVoiceUIState('idle');
+}
+
+function switchModalToTextFallback() {
+  closeVoiceModal();
+  navigateTo('ai');
+  document.getElementById('ai-text-input').focus();
+}
+
+function viewGeneratedSimulationFromModal() {
+  closeVoiceModal();
+  navigateTo('simulator');
+}
+
+/**
+ * REWARDS REDEMPTION & OFFSET SIMULATIONS
+ */
+function redeemReward(name, pts) {
+  if (state.currentUser.greenPoints < pts) {
+    showToast("Insufficient Green Points balance.");
+    return;
+  }
+  state.currentUser.greenPoints -= pts;
+  updatePointsBadges();
+  showToast(`Successfully redeemed "${name}"!`);
+}
+
+function simulateOffset(project, cost) {
+  state.currentUser.greenPoints += 50;
+  state.transactions.unshift({
+    id: 'TX-' + Math.floor(1000 + Math.random() * 9000),
+    merchant: `Carbon Offset: ${project}`,
+    category: 'utilities',
+    amount: cost,
+    carbon: -10.0,
+    method: 'VCS Certified Peat/Mangrove Retirement',
+    source: 'Indonesia Carbon Exchange (IDXCarbon)',
+    points: 50,
+    date: 'Just now'
+  });
+  renderDashboardTransactions();
+  renderFullTransactions();
+  updatePointsBadges();
+  showToast(`Offset 10 kg CO2e via ${project}!`);
+}
+
+function updatePointsBadges() {
+  const pts = state.currentUser.greenPoints.toLocaleString();
+  document.getElementById('sidebar-green-points').innerText = pts;
+  document.getElementById('dashboard-green-points').innerText = pts;
+  document.getElementById('rewards-point-badge').innerText = pts;
+}
+
+/**
+ * TOAST & DEMO HELPERS
+ */
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  const label = document.getElementById('toast-message');
+  label.innerText = msg;
+  toast.classList.remove('translate-y-20', 'opacity-0');
+  setTimeout(() => {
+    toast.classList.add('translate-y-20', 'opacity-0');
+  }, 3500);
+}
+
+function toggleMobileMenu() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('hidden');
+}
+
+function toggleNotification() {
+  showToast("No new alerts. Your spending is 18.4% greener this month!");
+}
+
+/**
+ * NAVIGATION ROUTER
+ */
+function navigateTo(viewId) {
+  state.activeView = viewId;
+  
+  const views = ['dashboard', 'simulator', 'transactions', 'carbon', 'offset', 'greenmap', 'missions', 'rewards', 'ai', 'analytics', 'partner'];
+  views.forEach(v => {
+    const el = document.getElementById(`view-${v}`);
+    if (el) el.classList.add('hidden');
+    const navBtn = document.getElementById(`nav-${v}`);
+    if (navBtn) {
+      if (v === 'simulator') {
+        navBtn.className = "nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group";
+      } else {
+        navBtn.className = "nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-medium text-slate-600 hover:text-emerald-700 hover:bg-slate-50 transition-all group";
+      }
+    }
+  });
+
+  const activeEl = document.getElementById(`view-${viewId}`);
+  if (activeEl) activeEl.classList.remove('hidden');
+
+  const activeBtn = document.getElementById(`nav-${viewId}`);
+  if (activeBtn) {
+    activeBtn.className = "nav-item w-full flex items-center space-x-3 px-3 py-2.5 rounded-xl text-sm font-semibold text-emerald-800 bg-emerald-50/80 border border-emerald-200/60 transition-all group";
+  }
+
+  const titles = {
+    dashboard: 'Dashboard',
+    simulator: 'Before You Spend — Simulator',
+    transactions: 'Transactions',
+    carbon: 'Carbon Analytics',
+    offset: 'Offset & Invest',
+    greenmap: 'Green Map',
+    missions: 'Missions',
+    rewards: 'Green Rewards',
+    ai: 'SanPay Voice AI',
+    analytics: 'Analytics',
+    partner: 'Partner Network'
+  };
+  document.getElementById('page-title').innerText = titles[viewId] || 'SanPay Green FinOS';
+
+  if (window.innerWidth < 768) {
+    document.getElementById('sidebar').classList.add('hidden');
+  }
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
